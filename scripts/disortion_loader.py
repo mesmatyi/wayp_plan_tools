@@ -21,12 +21,30 @@ class DistortionLoader(Node):
         self.declare_parameter('PRBS_33Hz_amp=010deg.csv', csv_file_path)
         self.declare_parameter('delay', 0.1)
         
+        self.twist_commands = []
+        self.counter = 0
+                
     def listener_callback(self, msg):
         self.get_logger().info(f'Received command: linear={msg.linear.x}, angular={msg.angular.z}')
         
         steering_angle = msg.angular.z
         
-    def load_and_publish(self):
+        self.counter += 1
+        if self.counter < len(self.twist_commands):
+            steering_angle = steering_angle + float(self.twist_commands[self.counter])
+            self.get_logger().info(f'Applied distortion: {self.twist_commands[self.counter]}')
+            
+            
+        distorted_msg = Twist()
+        distorted_msg.linear.x = msg.linear.x
+        distorted_msg.angular.z = steering_angle
+        self.publisher.publish(distorted_msg)
+        self.get_logger().info(f'Published distorted command: linear={distorted_msg.linear.x}, angular={distorted_msg.angular.z}')
+        
+        
+        
+        
+    def load(self):
         csv_file = self.get_parameter('csv_file').value
         delay = self.get_parameter('delay').value
         
@@ -35,20 +53,16 @@ class DistortionLoader(Node):
                 reader = csv.reader(file)
                 for row in reader:
                     if row:
-                        twist = Twist()
-                        twist.linear.x = float(row[0])
-                        twist.angular.z = float(row[1]) if len(row) > 1 else 0.0
-                        
-                        self.publisher.publish(twist)
-                        self.get_logger().info(f'Published: linear={twist.linear.x}, angular={twist.angular.z}')
-                        time.sleep(delay)
+                        self.twist_commands.append(row[0])
+                        self.get_logger().info(f'Loaded: {row[0]}')
+                    
         except FileNotFoundError:
             self.get_logger().error(f'CSV file not found: {csv_file}')
 
 def main(args=None):
     rclpy.init(args=args)
     node = DistortionLoader()
-    node.load_and_publish()
+    node.load()
     rclpy.shutdown()
 
 if __name__ == '__main__':
