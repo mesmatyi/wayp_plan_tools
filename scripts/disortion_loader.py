@@ -13,13 +13,12 @@ class DistortionLoader(Node):
         self.publisher = self.create_publisher(Twist, '/cmd_vel', 10)
         self.subscriber = self.create_subscription(
             Twist,
-            '/cmd_vel',
+            '/cmd_vel_clear',
             self.listener_callback,
             10)
         
         csv_file_path = os.path.join(os.path.dirname(__file__), 'disortions/')
         self.declare_parameter('PRBS_33Hz_amp=010deg.csv', csv_file_path)
-        self.declare_parameter('delay', 0.1)
         
         self.twist_commands = []
         self.counter = 0

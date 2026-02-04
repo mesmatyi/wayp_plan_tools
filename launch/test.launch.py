@@ -46,7 +46,7 @@ def generate_launch_description():
             name='pure_pursuit',
             output='screen',
             parameters=[
-                {"cmd_topic": "cmd_vel"},
+                {"cmd_topic": "cmd_vel_clear"},
                 {"wheelbase": 2.789},
             ],
         ),
