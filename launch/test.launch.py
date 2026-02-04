@@ -34,8 +34,8 @@ def generate_launch_description():
             parameters=[
                 #{"file_dir": "/mnt/c/waypoints"},
                 {"file_dir": pkg_dir + "/csv"},
-                {"file_name": "example01.csv"},
-                {"per_waypoint_display": 10}, # display speed every 10th waypoint 
+                {"file_name": "raba_ring_utm.csv"},
+                {"per_waypoint_display": 1}, # display speed every 10th waypoint 
             ],
         ),
 
@@ -48,6 +48,17 @@ def generate_launch_description():
             parameters=[
                 {"cmd_topic": "cmd_vel_clear"},
                 {"wheelbase": 2.789},
+            ],
+        ),
+        
+        # add distortion to cmd_vel
+        Node(
+            package='wayp_plan_tools',
+            executable='disortion_loader.py',
+            name='distortion_loader',
+            output='screen',
+            parameters=[
+                {"csv_file": pkg_dir + "/disortions/PRBS_33Hz_amp=010deg.csv"},
             ],
         ),
     ])

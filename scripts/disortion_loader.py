@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -17,8 +19,7 @@ class DistortionLoader(Node):
             self.listener_callback,
             10)
         
-        csv_file_path = os.path.join(os.path.dirname(__file__), 'disortions/')
-        self.declare_parameter('PRBS_33Hz_amp=010deg.csv', csv_file_path)
+        self.declare_parameter('csv_file', "")
         
         self.twist_commands = []
         self.counter = 0
@@ -28,11 +29,13 @@ class DistortionLoader(Node):
         
         steering_angle = msg.angular.z
         
-        self.counter += 1
         if self.counter < len(self.twist_commands):
-            steering_angle = steering_angle + float(self.twist_commands[self.counter])
+            # convert the twist command to rad 
+            steering_angle = steering_angle + (float(self.twist_commands[self.counter]) * 3.14159 / 180.0)
+            steering_angle = steering_angle + (self.twist_commands[self.counter])
             self.get_logger().info(f'Applied distortion: {self.twist_commands[self.counter]}')
             
+        self.counter += 1
             
         distorted_msg = Twist()
         distorted_msg.linear.x = msg.linear.x
@@ -45,7 +48,6 @@ class DistortionLoader(Node):
         
     def load(self):
         csv_file = self.get_parameter('csv_file').value
-        delay = self.get_parameter('delay').value
         
         try:
             with open(csv_file, 'r') as file:

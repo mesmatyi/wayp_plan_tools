@@ -41,6 +41,12 @@ include_directories(
   include
 )
 
+# Install the python script
+install(PROGRAMS
+  scripts/disortion_loader.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 add_executable(waypoint_saver src/waypoint_saver.cpp)
 ament_target_dependencies(waypoint_saver  ${ament_dependencies} )
 add_executable(waypoint_loader src/waypoint_loader.cpp)
@@ -76,6 +82,7 @@ endif()
 install(DIRECTORY 
   launch
   csv
+  disortions
   DESTINATION share/${PROJECT_NAME})
 install(TARGETS
   waypoint_saver

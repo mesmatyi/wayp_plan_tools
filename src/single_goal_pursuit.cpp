@@ -53,7 +53,7 @@ public:
   SingleGoalPursuit() : Node("pure_pursuit_node")
   {
     RCLCPP_INFO_STREAM(this->get_logger(), "pure_pursuit_node started: ");
-    this->declare_parameter<std::string>("waypoint_topic", "");
+    this->declare_parameter<std::string>("waypoint_topic", "waypointarray");
     this->declare_parameter<std::string>("cmd_topic", cmd_topic);
     this->declare_parameter<float>("wheelbase", wheelbase);
     this->get_parameter("waypoint_topic", waypoint_topic);
